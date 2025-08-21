@@ -101,7 +101,7 @@ describe "/boards" do
 end
 
 describe "/boards/[ID]" do
-  it "has a 'Delete listing' link if the user is the owner", points: 5 do
+  it "has a 'Delete listing' link if the user is the owner", points: 3 do
     the_user = User.new
     the_user.username = "claire"
     the_user.email = "claire@example.com"
@@ -131,6 +131,47 @@ describe "/boards/[ID]" do
 
     visit "/boards/#{board_chi.id}"
 
-    expect(page).to have_tag("a", :text => /Delete listing/i)
+    expect(page).to have_tag("a", :text => /Delete listing/i),
+      "Expected page to have a 'Delete listing' link."
+  end
+end
+
+describe "/boards/[ID]" do
+  it "deletes the listing when the 'Delete listing' link is clicked", points: 5 do
+    the_user = User.new
+    the_user.username = "claire"
+    the_user.email = "claire@example.com"
+    the_user.password = "password"
+    the_user.save
+
+    visit "/users/sign_in"
+
+    within(:css, "form") do
+      fill_in "Email", with: the_user.email
+      fill_in "Password", with: the_user.password
+      click_button "Log in"
+    end
+
+    board_chi = Board.new
+    board_chi.name = "Chicago"
+    board_chi.user_id = the_user.id
+    board_chi.save
+
+    listing_1 = Listing.new
+    listing_1.title = "Guitar lessons"
+    listing_1.body = "Learn with me"
+    listing_1.expires_on = Date.today + 7.days
+    listing_1.board_id = board_chi.id
+    listing_1.user_id = the_user.id
+    listing_1.save
+
+    visit "/boards/#{board_chi.id}"
+
+    initial_listing_count = Listing.count
+
+    click_link "Delete listing"
+
+    final_listing_count = Listing.count
+    expect(final_listing_count).to eq(initial_listing_count - 1)
   end
 end
