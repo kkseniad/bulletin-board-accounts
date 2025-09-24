@@ -2,7 +2,7 @@ Rails.application.routes.draw do
   devise_for :users
   #get("/", { :controller => "boards", :action => "index" })
 
-  root to: "boards"
+  root to: "boards#index"
   # Routes for the Listing resource:
 
   # CREATE
