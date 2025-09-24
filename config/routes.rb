@@ -1,6 +1,7 @@
 Rails.application.routes.draw do
-  get("/", { :controller => "boards", :action => "index" })
+  #get("/", { :controller => "boards", :action => "index" })
 
+  root to: "boards"
   # Routes for the Listing resource:
 
   # CREATE
